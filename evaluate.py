@@ -8,11 +8,13 @@ import sys
 import warnings
 import copy
 
+from arff import xrange, basestring
 from sklearn.metrics import cohen_kappa_score
 import Levenshtein
 
 from data_loaders import EM_VALUE_MAPPING_DEFAULT
 import util
+
 
 class Event(object):
     def __init__(self, event_type, start, end, duration):
@@ -20,6 +22,7 @@ class Event(object):
         self.start = start
         self.end = end
         self.duration = duration
+
 
 # Ground truth is usually stored in ARFF files with a separate column for each hand-labelling expert (if multiple are
 # present). Each hand-labelling expert column contains numerical data with the following correspondence to eye movement
@@ -144,7 +147,7 @@ def compute_statistics(raw_stats):
                                                          raw_stats['FP'] +
                                                          raw_stats['TN'] +
                                                          raw_stats['FN']))
-        if (raw_stats['TP'] + raw_stats['FP'] + raw_stats['TN'] + raw_stats['FN']) != 0 else 0.0,
+            if (raw_stats['TP'] + raw_stats['FP'] + raw_stats['TN'] + raw_stats['FN']) != 0 else 0.0,
 
         'sensitivity': (float(raw_stats['TP']) / (raw_stats['TP'] + raw_stats['FN']))
         if (raw_stats['TP'] + raw_stats['FN']) != 0 else 0.0,
@@ -251,7 +254,7 @@ def evaluate_normalised_Levenshtein_dist(true_labels_list,
                                                                            'Consider using fewer labels or running ' \
                                                                            'this evaluation for each label ' \
                                                                            'independently by passing a ' \
-                                                                           '@positive_label parameter.'.\
+                                                                           '@positive_label parameter.'. \
             format(len(all_unique_labels), len(characters_to_encode_labels))
         all_unique_labels_mapping = {val: characters_to_encode_labels[i] for i, val in enumerate(all_unique_labels)}
         if positive_label is not None:
@@ -262,8 +265,8 @@ def evaluate_normalised_Levenshtein_dist(true_labels_list,
                     all_unique_labels_mapping[key] = '1'
 
         if verbose:
-            print 'For the positive label of {}, using the following mapping: {}'.format(positive_label,
-                                                                                     all_unique_labels_mapping)
+            print('For the positive label of {}, using the following mapping: {}'.format(
+                positive_label, all_unique_labels_mapping))
 
         # Sample-level distance
         symbol_sequence_true = ''.join([all_unique_labels_mapping[x]
@@ -361,6 +364,7 @@ def evaluate_basic_statistics(true_labels_list,
 
             def filter_lambda(x):
                 return x.type == positive_label
+
             ground_truth_events = filter(filter_lambda, ground_truth_events)
             assigned_events = filter(filter_lambda, assigned_events)
 
@@ -516,7 +520,7 @@ def evaluate_episodes_adjusted_Cohens_kappa(true_labels_list,
                 # find the intersecting assigned events
                 # skip through the events that end before the current ground truth one
                 while assigned_event_i < len(evaluated_events) and \
-                                evaluated_events[assigned_event_i].end <= ground_truth_event.start:
+                        evaluated_events[assigned_event_i].end <= ground_truth_event.start:
                     # detected event that missed
                     if not only_match_positive_events or evaluated_events[assigned_event_i].type == positive_label:
                         acc_denom += 1
@@ -528,7 +532,7 @@ def evaluate_episodes_adjusted_Cohens_kappa(true_labels_list,
                 candidate_event_i = assigned_event_i
                 # while the events keep (potentially) intersecting, keep iterating and checking the intersection
                 while candidate_event_i < len(evaluated_events) and \
-                      evaluated_events[candidate_event_i].start < ground_truth_event.end:
+                        evaluated_events[candidate_event_i].start < ground_truth_event.end:
                     intersection_flag, iou = check_event_intersection(ground_truth_event,
                                                                       evaluated_events[candidate_event_i],
                                                                       intersection_over_union_threshold=
@@ -578,11 +582,12 @@ def evaluate_episodes_adjusted_Cohens_kappa(true_labels_list,
             if not only_match_positive_events:
                 assert len(ground_truth_events) + len(evaluated_events) == acc_denom, \
                     'Different number of events matched + not matched compared to the total number of events: {} events ' \
-                    'in two lists in total, {} -- after (not) matching'.format(len(ground_truth_events) + len(evaluated_events),
-                                                                               acc_denom)
+                    'in two lists in total, {} -- after (not) matching'.format(
+                        len(ground_truth_events) + len(evaluated_events),
+                        acc_denom)
             else:
                 num_pos_events = len([e for e in ground_truth_events + evaluated_events if e.type == positive_label])
-                assert num_pos_events == acc_denom, 'Found {} events in the accuracy denominator instead of expected {}'\
+                assert num_pos_events == acc_denom, 'Found {} events in the accuracy denominator instead of expected {}' \
                     .format(acc_denom, num_pos_events)
             accuracies[key].append((acc_nom / acc_denom) if acc_denom > 0 else 0.0)
 
@@ -671,8 +676,7 @@ def evaluate_episodes_as_Zemblys_et_al(true_labels_list,
             # find the intersecting assigned events
             # skip through the events that end before the current ground truth one
             while assigned_event_i < len(assigned_events) and \
-                  assigned_events[assigned_event_i].end <= ground_truth_event.start:
-
+                    assigned_events[assigned_event_i].end <= ground_truth_event.start:
                 false_alarm_labels_buffer.append(assigned_events[assigned_event_i].type)
                 assigned_event_i += 1
 
@@ -682,8 +686,9 @@ def evaluate_episodes_as_Zemblys_et_al(true_labels_list,
             candidate_event_i = assigned_event_i
             # while the events keep (potentially) intersecting, keep iterating and checking the intersection criterion
             while candidate_event_i < len(assigned_events) and \
-                  assigned_events[candidate_event_i].start < ground_truth_event.end:
-                intersection_flag, iou = check_event_intersection(ground_truth_event, assigned_events[candidate_event_i],
+                    assigned_events[candidate_event_i].start < ground_truth_event.end:
+                intersection_flag, iou = check_event_intersection(ground_truth_event,
+                                                                  assigned_events[candidate_event_i],
                                                                   intersection_over_union_threshold=
                                                                   intersection_over_union_threshold,
                                                                   return_iou=True)
@@ -716,8 +721,8 @@ def evaluate_episodes_as_Zemblys_et_al(true_labels_list,
             false_alarm_labels_buffer.append(assigned_events[candidate_event_i].type)
 
         assert len(ground_truth_events) + len(assigned_events) == local_matched_events_count * 2 + \
-                                                                  len(missed_labels_buffer) + \
-                                                                  len(false_alarm_labels_buffer), \
+               len(missed_labels_buffer) + \
+               len(false_alarm_labels_buffer), \
             'Different number of events matched + not matched compared to the total number of events: {} events ' \
             'in two lists in total, {} -- after matching'.format(len(ground_truth_events) + len(assigned_events),
                                                                  local_matched_events_count * 2 +
@@ -798,7 +803,7 @@ def evaluate_episodes_as_Hooge_et_al(true_labels_list,
             # find the intersecting assigned events
             # skip through the events that end before the current ground truth one
             while assigned_event_i < len(assigned_events) and \
-                  assigned_events[assigned_event_i].end <= ground_truth_event.start:
+                    assigned_events[assigned_event_i].end <= ground_truth_event.start:
                 assigned_event_i += 1
                 raw_stats['FP'] += 1  # we had to skip a detected event because it didn't match anything -> False Alarm
                 if verbose:
@@ -808,7 +813,7 @@ def evaluate_episodes_as_Hooge_et_al(true_labels_list,
             hit_iou = 0.0
             # while the events keep (potentially) intersecting, keep iterating and checking the intersection criterion
             while assigned_event_i < len(assigned_events) and \
-                  assigned_events[assigned_event_i].start < ground_truth_event.end:
+                    assigned_events[assigned_event_i].start < ground_truth_event.end:
                 intersection_flag, iou = check_event_intersection(ground_truth_event, assigned_events[assigned_event_i],
                                                                   intersection_over_union_threshold=
                                                                   intersection_over_union_threshold,
@@ -822,12 +827,14 @@ def evaluate_episodes_as_Hooge_et_al(true_labels_list,
                     assigned_event_i += 1
                     raw_stats['TP'] += 1  # found a match -> Hit
                     if verbose:
-                        print >> sys.stderr, 'Registered a Hit for', ground_truth_event, 'and', assigned_events[assigned_event_i - 1]
+                        print >> sys.stderr, 'Registered a Hit for', ground_truth_event, 'and', assigned_events[
+                            assigned_event_i - 1]
 
                     break
                 else:
                     assigned_event_i += 1
-                    raw_stats['FP'] += 1  # we had to skip a detected event because it didn't match anything -> False Alarm
+                    raw_stats[
+                        'FP'] += 1  # we had to skip a detected event because it didn't match anything -> False Alarm
                     if verbose:
                         print >> sys.stderr, 'Registered a False Alarm for', assigned_events[assigned_event_i - 1]
 
@@ -848,7 +855,7 @@ def evaluate_episodes_as_Hooge_et_al(true_labels_list,
     else:
         stats = {
             'F1': (2 * raw_stats['TP'] / (2 * raw_stats['TP'] + raw_stats['FN'] + raw_stats['FP']))
-                  if 2 * raw_stats['TP'] + raw_stats['FN'] + raw_stats['FP'] != 0 else 0.0,
+            if 2 * raw_stats['TP'] + raw_stats['FN'] + raw_stats['FP'] != 0 else 0.0,
             'IoU': (raw_stats['Total IoU'] / raw_stats['Total events']) if raw_stats['Total events'] != 0 else 0.0
         }
         return stats
@@ -942,7 +949,7 @@ def evaluate_episodes_as_Hoppe_et_al(true_labels_list, assigned_labels_list, exp
                     raw_confusion[alg_majority_label] += 1
                 elif alg_majority_label != 'UNKNOWN':
                     print >> sys.stderr, 'Had to skip this label when computing the confusion matrix: ' \
-                                         '{}, while full label list contains {} (this should not happen!)'.\
+                                         '{}, while full label list contains {} (this should not happen!)'. \
                         format(alg_majority_label, labels)
 
                 if alg_majority_label == positive_label:
@@ -961,7 +968,8 @@ def evaluate_episodes_as_Hoppe_et_al(true_labels_list, assigned_labels_list, exp
 
             start_i += grp_len
 
-    raw_confusion = {k: (raw_confusion[k] / raw_confusion_denominator) if raw_confusion_denominator != 0 else 0.0 for k in labels}
+    raw_confusion = {k: (raw_confusion[k] / raw_confusion_denominator) if raw_confusion_denominator != 0 else 0.0 for k
+                     in labels}
 
     if return_raw_stats:
         raw_stats['confusion'] = raw_confusion

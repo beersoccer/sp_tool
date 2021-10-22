@@ -10,6 +10,7 @@ import numpy as np
 
 from collections import Counter
 
+from arff import xrange
 from sp_tool.arff_helper import ArffHelper
 from sp_tool import util
 from sp_tool.data_loaders import EM_VALUE_MAPPING_DEFAULT

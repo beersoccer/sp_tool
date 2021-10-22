@@ -1,11 +1,14 @@
 #!/usr/bin/env python
+import platform
 import tempfile
 import warnings
 import os
 import sys
 import argparse
 import glob
-from collections import OrderedDict, Iterable, defaultdict
+from collections import OrderedDict
+from collections import defaultdict
+from collections.abc import Iterable
 import json
 
 from saccade_detector import SaccadeDetector
@@ -70,6 +73,11 @@ def run_detection(params):
                                                        'gaze_extension': '.arff'}})
     :return: path to results folder
     """
+    if platform.system() == "Windows":
+        is_windows = True
+    else:
+        is_windows = False
+
     # make a defaultdict  out of @parameters so that we could always access its first-level keys
     params_default_first_level = defaultdict(dict)
     params_default_first_level.update(params)
@@ -82,7 +90,7 @@ def run_detection(params):
         out_folder = tempfile.mkdtemp(prefix='sp_tool_')
         warnings.warn('No output folder provided, using {}'.format(out_folder))
     if verbose:
-        print >> sys.stderr, 'Outputs will be written to folder', out_folder
+        print(sys.stderr, 'Outputs will be written to folder', out_folder)
 
     saccade_detector = SaccadeDetector(**params['SaccadeDetector'])
     blink_detector = BlinkDetector(**params['BlinkDetector'])
@@ -102,11 +110,18 @@ def run_detection(params):
     in_folder = params['GeneralArguments'].get('input_folder')
     if not in_folder:
         raise ValueError('\'input_folder\' is a required parameter of the \'GeneralArguments\' group in @params!')
-    folder_names = sorted(glob.glob('{}/*/'.format(in_folder)))  # getting all the folders of the input folder
+    else:
+        print("Input dataset folder: {}".format(in_folder))
+    # getting all the folders of the input folder
+    folder_names = sorted(glob.glob('{}/*/'.format(in_folder)))
+    if is_windows:
+        folder_names = [x.replace('\\', '/') for x in folder_names]
     # extract names from path
     if not folder_names and verbose:
-        print >> sys.stderr, 'No subfolders found under "{}"'.format(in_folder)
+        print(sys.stderr, 'No subfolders found under "{}"'.format(in_folder))
     folder_names = [os.path.splitext(os.path.basename(folder.rstrip('/')))[0] for folder in folder_names]
+    if verbose:
+        print("Input dataset subfolders: {}".format(", ".join(x for x in folder_names)))
 
     movies = params['GeneralArguments'].get('movies')
     if movies:  # not empty, restrict to these folders only
@@ -114,7 +129,7 @@ def run_detection(params):
         folder_names = [fn for fn in folder_names if fn in movies]
 
     if verbose:
-        print >> sys.stderr, 'Working with movies:', folder_names
+        print(sys.stderr, 'Working with movies:', folder_names)
 
     # data files extension
     gaze_pattern = params['GeneralArguments'].get('gaze_file_pattern', '*.coord')
@@ -126,7 +141,7 @@ def run_detection(params):
         if not os.path.exists(full_out_folder):
             os.makedirs(full_out_folder)
         if verbose:
-            print >> sys.stderr, 'Started processing for {},'.format(movie), 'results will appear in', full_out_folder
+            print(sys.stderr, 'Started processing for {},'.format(movie), 'results will appear in', full_out_folder)
 
         # The next lines load the data files of the recording with one particular movie.
         # To do this, here we provide a regex that includes all the .{extension} files in the respective folder.
@@ -134,9 +149,9 @@ def run_detection(params):
         #
         gaze_data_files = sorted(glob.glob('{}/{}/{}'.format(in_folder, movie, gaze_pattern)))
         if len(gaze_data_files) == 0:
-            print >> sys.stderr, 'Found 0 files with this pattern: "{}". Omitting this directory.'.format(
+            print(sys.stderr, 'Found 0 files with this pattern: "{}". Omitting this directory.'.format(
                 '{}/{}/{}'.format(in_folder, movie, gaze_pattern)
-            )
+            ))
             continue
         try:
             # The next line loads the data, labels saccades, blinks and fixations.
@@ -144,7 +159,7 @@ def run_detection(params):
                 gaze_data_files, verbose=verbose, data_format=params['GeneralArguments'].get('input_data_type'))
             # This will label the smooth pursuits
             if verbose:
-                print >> sys.stderr, 'Saccades/blinks/fixations are detected, starting SP detection.'
+                print(sys.stderr, 'Saccades/blinks/fixations are detected, starting SP detection.')
             classified_gaze_points = sp_detector.detect(gaze_points_list)
 
             # Now just dump the resulting structure into .arff files in the respective subdirectory of the @out_folder
@@ -153,7 +168,7 @@ def run_detection(params):
                 ArffHelper.dump(arff_data, open(
                     '{}/{}.arff'.format(full_out_folder, output_file_name), 'w')).close()
         except Exception as e:
-            print >> sys.stderr, 'Had to skip {} due to an error "{}"'.format(movie, e.message)
+            print(sys.stderr, 'Had to skip {} due to an error "{}"'.format(movie, e))
     return out_folder
 
 
@@ -556,7 +571,7 @@ def create_parameters_from_args(parsed_args, ignore_unused_arguments=False):
     # get a dictionary view on this
     args_dict = vars(parsed_args).copy()
     # clean up the args, i.e. remove None values so that they do not remain 'untouched' until the end
-    args_dict = {k: v for k, v in args_dict.iteritems() if v is not None}
+    args_dict = {k: v for k, v in args_dict.items() if v is not None}
 
     # we will pop the arguments from args_dict to ensure no not-used parameters are passed
 
@@ -610,9 +625,10 @@ def create_parameters_from_args(parsed_args, ignore_unused_arguments=False):
 
     return res_params
 
+
 if __name__ == '__main__':
     args = parse_args()
     parameters = create_parameters_from_args(args)
     if parameters['GeneralArguments'].get('verbose'):
-        print >> sys.stderr, util.pretty_string(parameters)
+        print(sys.stderr, util.pretty_string(parameters))
     run_detection(parameters)

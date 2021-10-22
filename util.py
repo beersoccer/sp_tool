@@ -71,7 +71,7 @@ def calculate_ppd(arff_object, skip_consistency_check=False):
         'DISTANCE': ('distance_mm', lambda val: val * 1e3)
     }
 
-    for obsolete_key, (new_key, value_modifier) in calculate_ppd.OBSOLETE_METADATA_KEYS_MAPPING.iteritems():
+    for obsolete_key, (new_key, value_modifier) in calculate_ppd.OBSOLETE_METADATA_KEYS_MAPPING.items():
         if obsolete_key in arff_object['metadata'] and new_key not in arff_object['metadata']:
             warnings.warn('Keys {} are obsolete and will not necessarily be supported in future. '
                           'Consider using their more explicit alternatives: {}'

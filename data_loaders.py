@@ -5,6 +5,8 @@ from functools import wraps
 from collections import OrderedDict
 import inspect
 
+from arff import xrange
+
 from arff_helper import ArffHelper
 import util
 

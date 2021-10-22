@@ -4,6 +4,8 @@ import numpy as np
 import abc
 import copy
 
+from arff import xrange
+
 from arff_helper import ArffHelper
 from recording_processor import RecordingProcessor
 

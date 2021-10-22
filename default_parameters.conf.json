@@ -1,12 +1,12 @@
 {
     "GeneralArguments": {
         "config_file": null,
-        "input_folder": "../GazeCom/gaze_arff/",
+        "input_folder": "./GazeCom/gaze_arff/",
         "gaze_file_pattern": "*.arff",
         "input_data_type": null,
-        "verbose": false,
+        "verbose": true,
         "movies": [],
-        "output_folder": null
+        "output_folder": "./output"
     },
     "SaccadeDetector": {
         "tolerance": 0.0,

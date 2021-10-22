@@ -2,6 +2,7 @@ import sys
 import copy
 
 import numpy as np
+from arff import xrange
 
 import util
 from arff_helper import ArffHelper

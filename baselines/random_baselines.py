@@ -12,9 +12,9 @@ from itertools import groupby
 import numpy as np
 import pickle
 
-from sp_tool.arff_helper import ArffHelper
-from sp_tool.data_loaders import EM_VALUE_MAPPING_DEFAULT
-from sp_tool import util
+from arff_helper import ArffHelper
+from data_loaders import EM_VALUE_MAPPING_DEFAULT
+import util
 
 
 def maybe_cast_to_float(d):
@@ -103,9 +103,9 @@ def load_sampling_parameters(args):
             transition_probabilities[key][key_next] /= transition_denom[key]
 
     total_events = sum(transition_denom.values())
-    a_priori_prob = {k: v / total_events for k, v in transition_denom.iteritems()}
+    a_priori_prob = {k: v / total_events for k, v in transition_denom.items()}
 
-    print 'Skipped', skipped_samples, 'samples/events out, a total of', total_events, 'samples/events analysed'
+    print('Skipped', skipped_samples, 'samples/events out, a total of', total_events, 'samples/events analysed')
 
     return plausible_durations_in_samples, transition_probabilities, a_priori_prob
 

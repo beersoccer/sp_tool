@@ -3,6 +3,8 @@
 import sys
 import warnings
 
+from arff import xrange
+
 import data_loaders
 from saccade_detector import SaccadeDetector
 from blink_detector import BlinkDetector
@@ -190,7 +192,7 @@ class RecordingProcessor:
         res = []
         observer_id = 0
         if verbose:
-            print >> sys.stderr, 'Loading {} files:'.format(len(fnames))
+            print(sys.stderr, 'Loading {} files:'.format(len(fnames)))
         for i, fname in enumerate(fnames):
             gaze_points = self.load_recording(fname,
                                               data_format=data_format,
@@ -206,7 +208,7 @@ class RecordingProcessor:
             res.append(gaze_points)
             if verbose:
                 util.update_progress((i + 1, len(fnames)))
-        print >> sys.stderr
+        print(sys.stderr)
         if validate_ppd:
             RecordingProcessor.validate_ppd_of_multiple_recordings(res)
         return res
