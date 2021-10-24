@@ -117,7 +117,7 @@ def get_xy_moving_average(data, window_size, inplace=False):
         format(window_size)
     if not inplace:
         data = data.copy()
-    offset = (window_size - 1) / 2
+    offset = int((window_size - 1) / 2)
     for column in ['x', 'y']:
         res = np.cumsum(data[column], dtype=float)
         res[window_size:] = res[window_size:] - res[:-window_size]

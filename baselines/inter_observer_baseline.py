@@ -21,7 +21,7 @@ def label_events(args):
 
     if args.output_folder is None:
         args.output_folder = tempfile.mkdtemp(prefix='inter_observer_baseline_')
-        print >> sys.stderr, 'Creating a temporary folder for the output in "{}"'.format(args.output_folder)
+        print(sys.stderr, 'Creating a temporary folder for the output in "{}"'.format(args.output_folder))
 
     for folder_candidate in sorted(os.listdir(args.input)):
         in_subfolder = os.path.join(args.input, folder_candidate)
@@ -35,10 +35,10 @@ def label_events(args):
         matched_observers = all_observers[:]  # copy the list
         while any([x == y for x, y in zip(all_observers, matched_observers)]):
             np.random.shuffle(matched_observers)
-        print >> sys.stderr, 'For the "{}" stimulus, the following observer recordings are matched:'.\
-            format(folder_candidate)
-        print >> sys.stderr, zip([os.path.split(x)[1] for x in all_observers],
-                                 [os.path.split(x)[1] for x in matched_observers])
+        print(sys.stderr,
+              'For the "{}" stimulus, the following observer recordings are matched:'.format(folder_candidate))
+        print(sys.stderr, zip([os.path.split(x)[1] for x in all_observers],
+                              [os.path.split(x)[1] for x in matched_observers]))
 
         for target_observer, source_observer in zip(all_observers, matched_observers):
             out_fname = os.path.join(out_subfolder, os.path.split(target_observer)[1])

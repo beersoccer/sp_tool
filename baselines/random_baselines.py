@@ -161,7 +161,7 @@ def label_events(args, event_durations, transition_matrix, a_priori_probs):
 
     if args.output_folder is None:
         args.output_folder = tempfile.mkdtemp(prefix='random_baseline_')
-        print >> sys.stderr, 'Creating a temporary folder for the output in "{}"'.format(args.output_folder)
+        print(sys.stderr, 'Creating a temporary folder for the output in "{}"'.format(args.output_folder))
 
     for root, dirs, files in os.walk(args.input):
         for file in sorted(files):
@@ -202,7 +202,7 @@ def split_up_long_events(args, event_durations, transition_matrix, a_priori_prob
 
     if args.output_folder is None:
         args.output_folder = tempfile.mkdtemp(prefix='random_baseline_')
-        print >> sys.stderr, 'Creating a temporary folder for the output in "{}"'.format(args.output_folder)
+        print(sys.stderr, 'Creating a temporary folder for the output in "{}"'.format(args.output_folder))
 
     generator_state = {
         'previous_em': None,

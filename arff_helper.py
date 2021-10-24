@@ -348,7 +348,7 @@ class ArffHelper(object):
         if 'metadata' in obj:
             metadata_strings = []
             if len(obj['metadata']) != 0:
-                for key, value in obj['metadata'].iteritems():
+                for key, value in obj['metadata'].items():
                     # we dump %@METADATA strings manually to avoid space characters between '%' and '@METADATA'.
                     metadata_strings.append(' '.join(['%' + ArffHelper._METADATA_STRING,
                                                       key,

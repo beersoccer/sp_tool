@@ -206,7 +206,8 @@ class DBSCANWithTimeSlice(object):
         data_set = []
         for i in range(len(gaze_points_list)):
             gaze_points_data = gaze_points_list[i]['data'][
-                (gaze_points_list[i]['data']['EYE_MOVEMENT_TYPE'] == 'UNKNOWN')][['time', 'x', 'y', 'global_index']]
+                (gaze_points_list[i]['data']['EYE_MOVEMENT_TYPE'] == b'UNKNOWN')][['time', 'x', 'y', 'global_index']]
+            # gaze_points_data = gaze_points_list[i]['data'][['time', 'x', 'y']]
             gaze_points_data = ArffHelper.add_column_to_array(gaze_points_data, 'observer_id', 'NUMERIC',
                                                               gaze_points_list[i]['metadata']['observer_id'])
             gaze_points_data = ArffHelper.add_column_to_array(gaze_points_data, 'CLUSTER_ID', 'NUMERIC', -1)

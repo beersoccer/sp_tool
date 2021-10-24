@@ -27,7 +27,7 @@ class Event(object):
 # Ground truth is usually stored in ARFF files with a separate column for each hand-labelling expert (if multiple are
 # present). Each hand-labelling expert column contains numerical data with the following correspondence to eye movement
 # types:
-CORRESPONDENCE_TO_HAND_LABELLING_VALUES = {value: key for key, value in EM_VALUE_MAPPING_DEFAULT.iteritems()}
+CORRESPONDENCE_TO_HAND_LABELLING_VALUES = {value: key for key, value in EM_VALUE_MAPPING_DEFAULT.items()}
 
 
 def get_majority_vote_efficient(obj, experts, positive_label):
@@ -412,7 +412,7 @@ def evaluate_basic_statistics(true_labels_list,
     else:
         for key in stats:
             denom = sum(stats[key]['samples_amount'].values())
-            stats[key]['samples_amount'] = {k: v / denom for k, v in stats[key]['samples_amount'].iteritems()}
+            stats[key]['samples_amount'] = {k: v / denom for k, v in stats[key]['samples_amount'].items()}
 
     return stats
 
@@ -807,7 +807,7 @@ def evaluate_episodes_as_Hooge_et_al(true_labels_list,
                 assigned_event_i += 1
                 raw_stats['FP'] += 1  # we had to skip a detected event because it didn't match anything -> False Alarm
                 if verbose:
-                    print >> sys.stderr, 'Registered a False Alarm for', assigned_events[assigned_event_i - 1]
+                    print(sys.stderr, 'Registered a False Alarm for', assigned_events[assigned_event_i - 1])
 
             hit_event_i = None
             hit_iou = 0.0
@@ -827,8 +827,8 @@ def evaluate_episodes_as_Hooge_et_al(true_labels_list,
                     assigned_event_i += 1
                     raw_stats['TP'] += 1  # found a match -> Hit
                     if verbose:
-                        print >> sys.stderr, 'Registered a Hit for', ground_truth_event, 'and', assigned_events[
-                            assigned_event_i - 1]
+                        print(sys.stderr, 'Registered a Hit for', ground_truth_event,
+                              'and', assigned_events[assigned_event_i - 1])
 
                     break
                 else:
@@ -836,19 +836,19 @@ def evaluate_episodes_as_Hooge_et_al(true_labels_list,
                     raw_stats[
                         'FP'] += 1  # we had to skip a detected event because it didn't match anything -> False Alarm
                     if verbose:
-                        print >> sys.stderr, 'Registered a False Alarm for', assigned_events[assigned_event_i - 1]
+                        print(sys.stderr, 'Registered a False Alarm for', assigned_events[assigned_event_i - 1])
 
             if hit_event_i is None:
                 raw_stats['FN'] += 1  # no match found -> Miss
                 if verbose:
-                    print >> sys.stderr, 'Registered a Miss for', ground_truth_event
+                    print(sys.stderr, 'Registered a Miss for', ground_truth_event)
             raw_stats['Total IoU'] += hit_iou  # 0 if no match was found
 
         # went through all the ground truth events, let's see whether any detected events remain (all False Alarms)
         if assigned_event_i < len(assigned_events):
             raw_stats['FP'] += len(assigned_events) - assigned_event_i
             if verbose:
-                print >> sys.stderr, 'Registered', len(assigned_events) - assigned_event_i, 'additional False Alarms'
+                print(sys.stderr, 'Registered', len(assigned_events) - assigned_event_i, 'additional False Alarms')
 
     if return_raw_stats:
         return raw_stats
@@ -948,9 +948,9 @@ def evaluate_episodes_as_Hoppe_et_al(true_labels_list, assigned_labels_list, exp
                 if alg_majority_label in labels:
                     raw_confusion[alg_majority_label] += 1
                 elif alg_majority_label != 'UNKNOWN':
-                    print >> sys.stderr, 'Had to skip this label when computing the confusion matrix: ' \
-                                         '{}, while full label list contains {} (this should not happen!)'. \
-                        format(alg_majority_label, labels)
+                    print(sys.stderr, 'Had to skip this label when computing the confusion matrix: '
+                                      '{}, while full label list contains {} (this should not happen!)'.
+                          format(alg_majority_label, labels))
 
                 if alg_majority_label == positive_label:
                     # true: +, detected: +

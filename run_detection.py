@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 import platform
 import tempfile
 import warnings
@@ -169,6 +170,8 @@ def run_detection(params):
                     '{}/{}.arff'.format(full_out_folder, output_file_name), 'w')).close()
         except Exception as e:
             print(sys.stderr, 'Had to skip {} due to an error "{}"'.format(movie, e))
+            # Display error stack if any exception occurs.
+            logging.exception(e)
     return out_folder
 
 
