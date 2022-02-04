@@ -74,6 +74,8 @@ unzipped it in the parent directory into the folder GazeCom. If that is not the 
 either change the config file, or pass an additional --input-folder /path/to/your/GazeCom/folder
 argument.
 
+The original eye movement data set can be found [here](https://www.inb.uni-luebeck.de/index.php?id=515).
+
 For programmatic interface, see documentation and comments in run_detection.py.
 For more examples of data conversion and programmatic interface usage, see examples/ as well.
 
